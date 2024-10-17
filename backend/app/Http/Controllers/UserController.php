@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -54,6 +55,25 @@ class UserController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
             ], 200);
+        }
+
+        return response()->json(['error' => 'User not authenticated'], 401);
+    }
+
+    public function upload(Request $request)
+    {
+        $request->validate([
+            'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $user = Auth::user();
+        if ($user) {
+            $path = $request->file('profile_photo')->store('profile_photos', 'public');
+
+            $user->profile_photo = Storage::url($path); 
+            $user->save();
+
+            return response()->json(['profile_photo' => $user->profile_photo], 200);
         }
 
         return response()->json(['error' => 'User not authenticated'], 401);

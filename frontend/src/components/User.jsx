@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Upload } from 'antd';
+import { Upload, message} from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
 
 
@@ -44,9 +44,38 @@ function User() {
   }, [navigate]);
 
 
-  const handleUpload = () => {
-    
-  }
+  const handleUpload = async (file) => {
+    const token = localStorage.getItem("access_token");
+
+    const formData = new FormData();
+    formData.append('profile_photo', file);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/user/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser((prevState) => ({
+          ...prevState,
+          profilePhoto: data.profile_photo, 
+        }));
+        message.success('Profile photo uploaded successfully');
+      } else {
+        message.error('Upload failed.');
+      }
+    } catch (error) {
+      console.error('Error uploading photo:', error);
+      message.error('An error occurred while uploading the photo.');
+    }
+  };
+
+
 
 
   const handleLogout = () => {
@@ -69,14 +98,16 @@ function User() {
       <div>
         <strong>Profile Photo:</strong>
         {user.profilePhoto ? (
-          <img src={user.profilePhoto} alt="Profile" style={{ width: '100%' }} />
+          <img src={`${process.env.REACT_APP_BASE_URL}${user.profilePhoto}`} alt="Profile" style={{ width: '100%' }} />
         ) : (
           <p>No profile photo uploaded.</p>
         )}
   </div>
 
 
-  <Upload name="profile_photo">
+  <Upload
+  beforeUpload={handleUpload}
+  name="profile_photo">
     <button>Upload Photo</button>
   </Upload>
       <div>
