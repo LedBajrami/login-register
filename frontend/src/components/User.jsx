@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Upload } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 
 function User() {
@@ -9,6 +9,42 @@ function User() {
     email: '', 
     profilePhoto: null,
   });
+
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/user`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        });
+    
+        if (!response.ok) {
+          throw new Error('Failed to fetch user data');
+        }
+    
+        const data = await response.json();
+        setUser({
+          name: data.name,
+          email: data.email,
+          profilePhoto: data.profile_photo || null,
+        });
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    }
+  
+    fetchUserData();
+  }, [navigate]);
+
+
+  const handleUpload = () => {
+    
+  }
 
 
   return (
@@ -23,7 +59,11 @@ function User() {
 
       <div>
         <strong>Profile Photo:</strong>
-        <img src={user.profilePhoto} alt="Profile" style={{ width: '100%' }} />
+        {user.profilePhoto ? (
+          <img src={user.profilePhoto} alt="Profile" style={{ width: '100%' }} />
+        ) : (
+          <p>No profile photo uploaded.</p>
+        )}
   </div>
 
 
