@@ -38,4 +38,4 @@ function User() {
   );
 }
 
-export default UserProfile;
+export default User;
