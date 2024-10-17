@@ -54,6 +54,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'profile_photo' => $user->profile_photo
             ], 200);
         }
 
