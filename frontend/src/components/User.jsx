@@ -49,6 +49,13 @@ function User() {
   }
 
 
+  const handleLogout = () => {
+    console.log('logout')
+    localStorage.removeItem('access_token');
+    navigate('/');
+};
+
+
   return (
     <div style={{ width: '400px', marginInline: 'auto', paddingTop: '50px' }}>
       <h2>User Profile</h2>
@@ -73,7 +80,7 @@ function User() {
     <button>Upload Photo</button>
   </Upload>
       <div>
-        <p><Link to="/">Logout</Link></p>
+        <button onClick={handleLogout}>Logout</button>
       </div>
     </div>
     
