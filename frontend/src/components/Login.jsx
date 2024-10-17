@@ -21,7 +21,8 @@ function Login() {
       if (response.status === 401) {
         setMessage('Unauthorized: Incorrect email or password'); 
       } else if (response.status === 200) {
-        navigate('/profile');
+        localStorage.setItem('access_token', data.token)
+        navigate('/user');
       } else {
         setMessage('Wrong credentials, please try again');
         console.error(data.message);

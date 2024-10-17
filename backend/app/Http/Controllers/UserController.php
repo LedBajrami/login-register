@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -30,10 +32,14 @@ class UserController extends Controller
 
         $credentials = $request->only('email', 'password');
 
+        
+
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            return response()->json(['user' => $user], 200);
+            $token = $user->createToken('LoginToken')->accessToken;
+
+            return response()->json(['message' => "User sucessfully logged in", 'user' => $user, 'token' => $token], 200);
         } else {
             return response()->json(['error' => 'Unauthorized'], 401);
         }

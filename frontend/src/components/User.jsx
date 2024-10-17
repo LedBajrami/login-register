@@ -15,11 +15,13 @@ function User() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        const token = localStorage.getItem("access_token")
         const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/user`, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
           },
         });
     
