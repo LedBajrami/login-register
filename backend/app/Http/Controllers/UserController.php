@@ -31,9 +31,9 @@ class UserController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+            $user = $this->getAuthenticatedUser();
 
-            $token = $user->createToken('LoginToken')->accessToken;
+            $token = $user->generateAccessToken();
 
             return response()->json(['message' => "User sucessfully logged in", 'user' => $user, 'token' => $token], 200);
         } else {
@@ -42,31 +42,34 @@ class UserController extends Controller
     }
 
     public function user() {
-        $user = Auth::user();
+        $user = $this->getAuthenticatedUser();
 
         if ($user) {
-            return response()->json([
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'profile_photo' => $user->profile_photo
-            ], 200);
+            return response()->json($user->getUserData(), 200);
         }
 
         return response()->json(['error' => 'User not authenticated'], 401);
     }
 
     public function upload(UploadPhotoRequest $request) {
-        $user = Auth::user();
+        $user = $this->getAuthenticatedUser();
         if ($user) {
-            $path = $request->file('profile_photo')->store('profile_photos', 'public');
+            $profile_photo = $user->uploadProfilePhoto($request->file('profile_photo'));
 
-            $user->profile_photo = Storage::url($path); 
-            $user->save();
-
-            return response()->json(['profile_photo' => $user->profile_photo], 200);
+            return response()->json(['profile_photo' => $profile_photo], 200);
         }
 
         return response()->json(['error' => 'User not authenticated'], 401);
+    }
+
+
+    private function getAuthenticatedUser() {
+        $user = Auth::user();
+
+        if(!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+
+        return $user;
     }
 }
