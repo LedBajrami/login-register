@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
+import { login } from '../../services/authService';
 
 function Login() {
   const [message, setMessage] = useState('');
@@ -8,28 +9,11 @@ function Login() {
 
   const handleSubmit = async (values) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values), 
-      });
-
-      const data = await response.json();
-
-      if (response.status === 401) {
-        setMessage('Unauthorized: Incorrect email or password'); 
-      } else if (response.status === 200) {
-        localStorage.setItem('access_token', data.token)
-        navigate('/user');
-      } else {
-        setMessage('Wrong credentials, please try again');
-        console.error(data.message);
-      }
+      await login(values.email, values.password);
+      navigate('/user');
     } catch (error) {
-      setMessage('An error occurred. Please try again later.');
-      console.error('Fetch error:', error);
+      setMessage('Invalid credentials, please try again.');
+      console.error(error)
     }
   };
 

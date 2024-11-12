@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Input, Button } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../../services/authService';
 
 function Register() {
   const [message, setMessage] = useState('');
@@ -15,30 +16,14 @@ function Register() {
     }
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          password_confirmation: confirmPassword, 
-        }),
-      });
-
-      const data = await response.json(); 
-
-      if (response.ok) {
-        navigate('/'); 
-      } else {
-        setMessage(data.message || 'Registration failed. Please try again.');
-        console.error(data.message);
-      }
+      await register(values);
+      navigate('/login'); 
     } catch (error) {
-      setMessage('An error occurred. Please try again later.');
-      console.error('Fetch error:', error);
+      if (error.message.includes("The email has already been taken.")) {
+        setMessage("This email is already taken. Please use a different one.");
+      } else {
+        setMessage('An error occurred. Please try again later.');
+      }
     }
   };
 
@@ -69,7 +54,10 @@ function Register() {
         <Form.Item
           label="Password"
           name="password"
-          rules={[{ required: true, message: 'Please enter your password!' }]}
+          rules={[
+            { required: true, message: 'Please enter your password!' },
+            { min: 6, message: 'Password must be at least 6 characters!' }
+          ]}
         >
           <Input.Password />
         </Form.Item>
@@ -80,6 +68,7 @@ function Register() {
           dependencies={['password']}
           rules={[
             { required: true, message: 'Please confirm your password!' },
+            { min: 6, message: 'Password must be at least 6 characters!' }
           ]}
         >
           <Input.Password />
