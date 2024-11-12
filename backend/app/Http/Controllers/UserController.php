@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\UploadPhotoRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -10,13 +13,7 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    public function register(Request $request) {
-
-        $request->validate([
-            'name' => 'required', 
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed'
-        ]);
+    public function register(RegisterRequest $request) {
 
         $user = User::create([
             'name' => $request->name,
@@ -29,11 +26,9 @@ class UserController extends Controller
 
 
 
-    public function login(Request $request) {
+    public function login(LoginRequest $request) {
 
         $credentials = $request->only('email', 'password');
-
-        
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
@@ -46,7 +41,7 @@ class UserController extends Controller
         }
     }
 
-    public function user(Request $request) {
+    public function user() {
         $user = Auth::user();
 
         if ($user) {
@@ -61,12 +56,7 @@ class UserController extends Controller
         return response()->json(['error' => 'User not authenticated'], 401);
     }
 
-    public function upload(Request $request)
-    {
-        $request->validate([
-            'profile_photo' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-
+    public function upload(UploadPhotoRequest $request) {
         $user = Auth::user();
         if ($user) {
             $path = $request->file('profile_photo')->store('profile_photos', 'public');
