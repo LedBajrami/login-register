@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import Login from '../components/Auth/Login';
 import Register from '../components/Auth/Register';
 import User from '../components/User/User'
+import AppLayout from '../components/Layout/Layout';
 
 const PublicRoute = ({children}) => {
   const isAuthenticated = !!localStorage.getItem('access_token')
@@ -15,21 +16,25 @@ const PrivateRoute = ({children}) => {
 
 export const router = createBrowserRouter([
   {
-    path: "/",  
-    element: <PublicRoute><Login /></PublicRoute>, 
-  },
-  {
-    path: "/login",  
-    element: <PublicRoute><Login /></PublicRoute>, 
-  },
-  {
-    path: "/register",  
-    element:  <PublicRoute><Register /></PublicRoute>,
-  },
-  {
-    path: "/user",  
-    element: <PrivateRoute><User /></PrivateRoute>,
-  },
+    element: <AppLayout />, children: [
+      {
+        path: "/",  
+        element: <PublicRoute><Login /></PublicRoute>, 
+      },
+      {
+        path: "/login",  
+        element: <PublicRoute><Login /></PublicRoute>, 
+      },
+      {
+        path: "/register",  
+        element:  <PublicRoute><Register /></PublicRoute>,
+      },
+      {
+        path: "/user",  
+        element: <PrivateRoute><User /></PrivateRoute>,
+      },
+    ]
+  }
 ]);
 
 export default router;
