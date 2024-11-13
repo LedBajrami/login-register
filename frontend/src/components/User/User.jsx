@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Upload, message} from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
+import { getUser } from '../../services/userService';
+import { logout } from '../../services/authService';
+import UserPhotoUpload from './UserPhotoUpload';
+
 
 
 function User() {
@@ -15,21 +18,7 @@ function User() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem("access_token")
-        const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/user`, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-        });
-    
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-        }
-    
-        const data = await response.json();
+        const data = await getUser()
         setUser({
           name: data.name,
           email: data.email,
@@ -44,42 +33,8 @@ function User() {
   }, [navigate]);
 
 
-  const handleUpload = async (file) => {
-    const token = localStorage.getItem("access_token");
-
-    const formData = new FormData();
-    formData.append('profile_photo', file);
-
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/user/upload`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser((prevState) => ({
-          ...prevState,
-          profilePhoto: data.profile_photo, 
-        }));
-        message.success('Profile photo uploaded successfully');
-      } else {
-        message.error('Upload failed.');
-      }
-    } catch (error) {
-      console.error('Error uploading photo:', error);
-      message.error('An error occurred while uploading the photo.');
-    }
-  };
-
-
-
-
-  const handleLogout = () => {
-    localStorage.removeItem('access_token');
+  const handleLogout =  async () => {
+    await logout()
     navigate('/');
 };
 
@@ -103,17 +58,9 @@ function User() {
         <div><strong>Email:</strong> {user.email}</div>
        </div>
       </div>
-      
-      
-    
-      
 
-
-  <Upload
-  beforeUpload={handleUpload}
-  name="profile_photo">
-    <button style={{marginBlock: "10px"}}>Upload Photo</button>
-  </Upload>
+      <UserPhotoUpload user={user} setUser={setUser}/>
+      
       <div>
         <button onClick={handleLogout}>Logout</button>
       </div>
