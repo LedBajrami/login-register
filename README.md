@@ -1,12 +1,12 @@
 # Login-Register System
 
-A user authentication and profile management system built with **Laravel** (backend) and **React** (frontend) using **Ant Design** for UI components and **Laravel Passport** for API authentication. This app includes features such as user registration, login, and profile photo upload.
+A user authentication and profile management system built with **Laravel** (backend) and **React** (frontend) using **Ant Design** for UI components and **Laravel Passport** for API authentication, and **Redux** for state management. This app includes features such as user registration, login, and profile photo upload.
 
 
 ## Technologies Used
 
 - **Backend**: PHP, Laravel
-- **Frontend**: JavaScript, React, React Router, Ant Design
+- **Frontend**: JavaScript, React, React-Redux, React Router, Ant Design
 - **API Authentication**: Laravel Passport
 - **Database**: SQLite
 - **Other**: Git
@@ -86,4 +86,4 @@ A user authentication and profile management system built with **Laravel** (back
 3. GET /api/user: Get authenticated user’s info.
 4. POST /api/user/upload: Upload profile photo.
 
-Note: All authenticated routes require an Authorization: Bearer <token> header.       is this correct
+Note: All authenticated routes require an Authorization: Bearer token header.
