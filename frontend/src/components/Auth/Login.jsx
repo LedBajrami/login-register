@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
 import { Form, Input, Button } from 'antd';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../../services/authService';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../../redux/slices/userSlice';
+import { loginUser } from '../../redux/slices/authThunks';
 
 function Login() {
-  const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch()
+  const errorMessage = useSelector((state) => state.auth.error)
+  const status = useSelector((state) => state.auth.status)
 
   const handleSubmit = async (values) => {
     try {
-      await login(values.email, values.password);
+      const data = await dispatch(loginUser(values)).unwrap()
+      dispatch(setUser(data.user))
       navigate('/user');
     } catch (error) {
-      setMessage('Invalid credentials, please try again.');
       console.error(error)
     }
   };
@@ -38,14 +42,14 @@ function Login() {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
-            Login
+          <Button type="primary" htmlType="submit" block disabled={status === 'loading'}>
+            {status == 'loading' ? "Redirecting to youy account": "Login"}
           </Button>
         </Form.Item>
       </Form>
 
       <div style={{ textAlign: 'center', marginTop: '10px' }}>
-        <p style={{ color: 'red' }}>{message}</p>
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         <p>
           Don't have an account? <Link to="/register">Register here</Link>
         </p>
