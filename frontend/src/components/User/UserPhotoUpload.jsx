@@ -1,23 +1,20 @@
-import { Upload } from "antd";
-import { uploadProfilePhoto } from "../../services/userService";
+import { Upload, message } from "antd";
+import { useDispatch } from "react-redux";
+import { uploadProfilePhoto } from "../../redux/slices/userThunks";
 
-function UserPhotoUpload({user, setUser}) {
+
+function UserPhotoUpload() {
+  const dispatch = useDispatch()
     const handleUpload = async (file) => {
-        const token = localStorage.getItem("access_token");
     
         try {
-          const data = await uploadProfilePhoto(file)
-       
-            setUser((prevState) => ({
-              ...prevState,
-              profilePhoto: data.profile_photo, 
-            }));
-
+          await dispatch(uploadProfilePhoto(file)).unwrap()
             message.success('Profile photo uploaded successfully');
         } catch (error) {
           console.error('Error uploading photo:', error);
           message.error('An error occurred while uploading the photo.');
         }
+        return false
       };
 
       return (
